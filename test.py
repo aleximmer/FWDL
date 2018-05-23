@@ -40,12 +40,12 @@ optimizer = PSGDl1(model.parameters(), lr=learning_rate, kappa_l1=kappa, momentu
 
 ## Choose loss
 
-criterion = nn.CrossEntropyLoss()
+criterion = nn.CrossEntropyLoss(size_average=False)
 
 ## train model
 
-model, train_loss, test_error = net.train_model(model, optimizer, criterion, epochs, \
-                                                    train_loader, test_loader, use_cuda)
+model, train_loss, test_error = net.train_model(model, optimizer, criterion, epochs,
+                                                train_loader, test_loader, use_cuda)
 
 
 ## plot results

@@ -52,7 +52,6 @@ class SGDl1(Optimizer):
         return loss
 
 
-
 class PSGDl1(Optimizer):
     """Projected SGD with projection onto l1 norm ball <= lambda_l1"""
     def __init__(self, params, lr, kappa_l1, momentum=0, dampening=0, nesterov=False):
