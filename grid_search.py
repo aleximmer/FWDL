@@ -13,10 +13,11 @@ if __name__ == '__main__':
     parser.add_argument('-b', '--batchsize', type=int, default=256)
     parser.add_argument('-lr', '--learning_rate', type=float, default=0.01)
     parser.add_argument('--momentum', type=float, default=0.9)
-    parser.add_argument('-p', '--processes', type=int, default=2)
+    parser.add_argument('-p', '--processes', type=int, default=1)
+    parser.add_argument('-z', '--zero_init', type=bool, default=True)
     args = parser.parse_args()
-    m, e, b, lr, mo = args.method, args.epochs, args.batchsize, args.learning_rate, args.momentum
-    prms = [(m, kappa, e, b, lr, mo) for kappa in args.kappas]
+    m, e, b, lr, mo, z = args.method, args.epochs, args.batchsize, args.learning_rate, args.momentum, args.zero_init
+    prms = [(m, kappa, e, b, lr, mo, z) for kappa in args.kappas]
     if args.processes > 1:
         with Pool(processes=args.processes) as pool:
             pool.starmap(experiment, prms)

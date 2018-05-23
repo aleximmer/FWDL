@@ -11,10 +11,9 @@ def get_exp_name(*args):
     return '_'.join([str(e) for e in args])
 
 
-def experiment(method, kappa, epochs, batch_size, lr, momentum):
+def experiment(method, kappa, epochs, batch_size, lr, momentum, zero_init):
     train_loader, test_loader = utils.load(batch_size=batch_size)
-    zinit = (method != 'SGD')
-    model = MLPNet(zero_init=zinit)
+    model = MLPNet(zero_init=zero_init)
     if method == 'SGD':
         optimizer = SGD(model.parameters(), lr=lr, momentum=momentum)
     elif method == 'PSGDl1':
@@ -27,7 +26,7 @@ def experiment(method, kappa, epochs, batch_size, lr, momentum):
     criterion = nn.CrossEntropyLoss(size_average=False)
     model, metrics = train_model(model, optimizer, criterion, epochs, train_loader, test_loader)
 
-    fname = get_exp_name(method, kappa, epochs, batch_size)
+    fname = get_exp_name(method, kappa, epochs, batch_size, zero_init)
     with open('results/' + fname + '.pkl', 'wb+') as f:
         pickle.dump(metrics, f)
 
@@ -42,7 +41,8 @@ if __name__ == '__main__':
     parser.add_argument('-b', '--batchsize', type=int, default=256)
     parser.add_argument('-lr', '--learning_rate', type=float, default=0.01)
     parser.add_argument('--momentum', type=float, default=0.9)
+    parser.add_argument('-z', '--zero_init', type=bool, default=True)
     args = parser.parse_args()
     if args.kappa is None and args.method != 'SGD':
         raise ValueError('Requires kappa parameter for constrained optimization')
-    experiment(args.method, args.kappa, args.epochs, args.batchsize, args.learning_rate, args.momentum)
+    experiment(args.method, args.kappa, args.epochs, args.batchsize, args.learning_rate, args.momentum, args.zero_init)
