@@ -22,12 +22,25 @@ class SGDl1(Optimizer):
 
         for group in self.param_groups:
             lam = group['l1']
+            momentum = group['momentum']
+            dampening = group['dampening']
 
             for p in group['params']:
                 if p.grad is None:
                     continue
                 d_p = p.grad.data
+                # l1 subgradient
                 d_p.add_(lam, torch.sign(p.data))
+
+                if momentum != 0:
+                    param_state = self.state[p]
+                    if 'momentum_buffer' not in param_state:
+                        buf = param_state['momentum_buffer'] = torch.zeros_like(p.data)
+                        buf.mul_(momentum).add_(d_p)
+                    else:
+                        buf = param_state['momentum_buffer']
+                        buf.mul_(momentum).add_(1 - dampening, d_p)
+                    d_p = buf
 
                 p.data.add_(-group['lr'], d_p)
 
