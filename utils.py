@@ -6,6 +6,8 @@ import os
 
 
 def load(batch_size=100):
+    """Loads the MNIST data set.
+    """
     root = './data'
     if not os.path.exists(root):
         os.mkdir(root)
@@ -28,10 +30,10 @@ def load(batch_size=100):
     return train_loader, test_loader
 
 
-def plot_loss_acc(train_loss, test_error):
+def plot_loss_acc(train_loss, test_error, optimizer):
     plt.plot(train_loss, label='train loss')
     plt.plot(test_error, label='test error')
     plt.xlabel("epochs"); 
-    plt.title("FWDL"); plt.legend();
+    plt.title("Optimizer = " + optimizer); plt.legend();
 
     plt.show()

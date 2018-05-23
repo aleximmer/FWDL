@@ -11,6 +11,9 @@ class SGDl1(Optimizer):
                         dampening=dampening, nesterov=nesterov)
         super(SGDl1, self).__init__(params, defaults)
 
+    def name(self):
+        return 'SGDl1'
+
     def step(self, closure=None):
         """Performs a single optimization step.
 
@@ -49,6 +52,7 @@ class SGDl1(Optimizer):
         return loss
 
 
+
 class PSGDl1(Optimizer):
     """Projected SGD with projection onto l1 norm ball <= lambda_l1"""
     def __init__(self, params, lr, kappa_l1, momentum=0, dampening=0, nesterov=False):
@@ -56,6 +60,9 @@ class PSGDl1(Optimizer):
         defaults = dict(lr=lr, kappa=kappa_l1, momentum=momentum,
                         dampening=dampening, nesterov=nesterov)
         super(PSGDl1, self).__init__(params, defaults)
+
+    def name(self):
+        return 'PSGDl1'
 
     def step(self, closure=None):
         """Performs a single optimization step.
@@ -103,6 +110,9 @@ class SGDFWl1(Optimizer):
         defaults = dict(kappa=kappa_l1)
         super(SGDFWl1, self).__init__(params, defaults)
 
+    def name(self):
+        return 'SGDFWl1'
+
     def step(self, closure=None):
         """Performs a single optimization step.
 
@@ -139,6 +149,9 @@ class SGDFWNuclear(Optimizer):
         assert kappa_l1 > 0
         defaults = dict(kappa=kappa_l1)
         super(SGDFWNuclear, self).__init__(params, defaults)
+
+    def name(self):
+        return 'SGDFWNuclear'
 
     def step(self, closure=None):
         """Performs a single optimization step.
