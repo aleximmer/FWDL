@@ -7,6 +7,9 @@ import numpy as np
 EPS = 1e-8  # sparsity threshold
 
 
+# TODO: -0.5 & all zero does not converge (just like tanh)
+# TODO: FW without -0.5 works with 0 init
+
 class MLPNet(nn.Module):
     def __init__(self, zero_init=True):
         super(MLPNet, self).__init__()
@@ -23,9 +26,9 @@ class MLPNet(nn.Module):
 
     def forward(self, x):
         x = x.view(-1, 28*28)
-        x = F.sigmoid(self.fc1(x)) - 0.5
-        x = F.sigmoid(self.fc2(x)) - 0.5
-        x = F.sigmoid(self.fc3(x)) - 0.5
+        x = F.sigmoid(self.fc1(x))
+        x = F.sigmoid(self.fc2(x))
+        x = F.sigmoid(self.fc3(x))
         x = F.softmax(self.fc4(x), dim=1)
         return x
 
@@ -34,10 +37,13 @@ class MLPNet(nn.Module):
             layer.weight.data.zero_()
             layer.bias.data.zero_()
 
+    def get_weight_matrices(self):
+        return [l.weight.detach().numpy() for l in self.layers]
+
     def paths(self):
         if self._paths is not None:
             return self._paths
-        self._paths = np.product([l.weight.shape[0] for l in self.layers]) * self.fc1.weight.shape[1]
+        self._paths = np.product([l.weight.shape[0] for l in self.layers[:-1]]) * self.fc1.weight.shape[1]
         return self._paths
 
     def active_paths(self):
@@ -49,22 +55,21 @@ class MLPNet(nn.Module):
     def nodes(self):
         if self._nodes is not None:
             return self._nodes
-        self._nodes = np.sum([l.weight.shape[0] for l in self.layers]) + self.fc1.weight.shape[1]
+        self._nodes = np.sum([l.weight.shape[0] for l in self.layers[:-1]]) + self.fc1.weight.shape[1]
         return self._nodes
 
     def active_nodes(self):
         n_active = 0
-        for i in range(len(self.layers)+1):
+        for i in range(len(self.layers)):
             n_active += self._comp_active_nodes(i)
         return n_active
 
     def _comp_active_nodes(self, layer):
-        active_out = None
-        if layer < len(self.layers):
-            # count outgoing sparsity
-            nextl = self.layers[layer]
-            W = nextl.weight.detach().numpy()
-            active_out = (np.sum(~np.isclose(W, 0, atol=EPS), axis=0) >= 1)
+        # count outgoing sparsity
+        nextl = self.layers[layer]
+        W = nextl.weight.detach().numpy()
+        active_out = (np.sum(~np.isclose(W, 0, atol=EPS), axis=0) >= 1)
+        """
         if layer > 0:
             # count incoming sparsity
             prevl = self.layers[layer - 1]
@@ -73,8 +78,8 @@ class MLPNet(nn.Module):
             active_in = (np.sum(~np.isclose(nodes, 0, atol=EPS), axis=1) >= 1)
             active = active_in if active_out is None else (active_out | active_in)
         else:
-            active = active_out
-        return np.sum(active)
+            active = active_out"""
+        return np.sum(active_out)
 
     def params(self):
         if self._params is not None:
@@ -109,6 +114,7 @@ def train_model(model, optimizer, criterion, epochs, train_loader, test_loader, 
     active_nodes = []
     active_paths = []
     active_params = []
+    weight_matrices = []
     for epoch in range(1, epochs+1):
         sum_loss = 0
         n_correct = 0
@@ -130,6 +136,7 @@ def train_model(model, optimizer, criterion, epochs, train_loader, test_loader, 
         active_nodes.append(model.f_active_nodes())
         active_paths.append(model.f_active_paths())
         active_params.append(model.f_active_params())
+        weight_matrices.append(model.get_weight_matrices())
         train_loss.append(sum_loss / n_samples)
         train_acc.append(n_correct / n_samples)
 
@@ -159,5 +166,6 @@ def train_model(model, optimizer, criterion, epochs, train_loader, test_loader, 
 
     metrics = {'train': {'loss': train_loss, 'acc': train_acc},
                'test': {'loss': test_loss, 'acc': test_acc},
-               'sparsity': {'params': active_params, 'nodes': active_nodes, 'paths': active_paths}}
+               'sparsity': {'params': active_params, 'nodes': active_nodes, 'paths': active_paths},
+               'weights': weight_matrices}
     return model, metrics
