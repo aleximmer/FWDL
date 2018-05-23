@@ -69,7 +69,7 @@ class SGDFWl1(Optimizer):
             loss = closure()
 
         for group in self.param_groups:
-            kappa = group['kappa_l1']
+            kappa = group['kappa']
 
             for p in group['params']:
                 if p.grad is None:
@@ -77,7 +77,7 @@ class SGDFWl1(Optimizer):
                 s = LMO_l1(p.grad.data.numpy(), kappa)
                 gamma = 2 / (self.k + 2)
                 # x^(k+1) = x^(k) - g x^(k) + g s
-                delta_p = gamma * s - gamma * p.data
+                delta_p = torch.Tensor(gamma * s - gamma * p.data.numpy())
                 p.data.add_(delta_p)
 
         self.k += 1
@@ -91,7 +91,7 @@ class SGDFWNuclear(Optimizer):
         self.k = 0
         assert kappa_l1 > 0
         defaults = dict(kappa=kappa_l1)
-        super(Optimizer, self).__init__(params, defaults)
+        super(SGDFWNuclear, self).__init__(params, defaults)
 
     def step(self, closure=None):
         """Performs a single optimization step.
@@ -105,15 +105,17 @@ class SGDFWNuclear(Optimizer):
             loss = closure()
 
         for group in self.param_groups:
-            kappa = group['kappa_l1']
+            kappa = group['kappa']
 
             for p in group['params']:
                 if p.grad is None:
                     continue
+
+                print(p.grad.data.numpy().shape)
                 s = LMO_nuclear(p.grad.data.numpy(), kappa)
                 gamma = 2 / (self.k + 2)
                 # x^(k+1) = x^(k) - g x^(k) + g s
-                delta_p = gamma * s - gamma * p.data
+                delta_p = torch.Tensor(gamma * s - gamma * p.data.numpy())
                 p.data.add_(delta_p)
 
         self.k += 1

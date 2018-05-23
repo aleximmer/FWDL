@@ -7,7 +7,12 @@ import torchvision.transforms as transforms
 import torch.nn.functional as F
 import torch.optim as optim
 
+from optimizers import SGDl1, SGDFWl1, SGDFWNuclear
+
 import numpy as np
+from matplotlib import pyplot as plt
+
+
 ## load mnist dataset
 use_cuda = torch.cuda.is_available()
 
@@ -72,58 +77,79 @@ class LeNet(nn.Module):
     def name(self):
         return "LeNet"
 
+
+def train_model(model, optimizer, criterion, epochs, train_loader):
+    train_loss = []
+    test_error = []
+    for epoch in range(epochs):
+        # trainning
+        ave_loss = 0
+        for batch_idx, (x, target) in enumerate(train_loader):
+            optimizer.zero_grad()
+            if use_cuda:
+                x, target = x.cuda(), target.cuda()
+            x, target = Variable(x), Variable(target)
+            out = model(x)
+
+            loss = criterion(out, target) 
+            ave_loss = ave_loss * 0.9 + loss.item() * 0.1
+            loss.backward()
+            optimizer.step()
+            if (batch_idx+1) % 100 == 0 or (batch_idx+1) == len(train_loader):
+                print('==>>> epoch: {}, batch index: {}, train loss: {:.5f}'.format(
+                    epoch, batch_idx+1, ave_loss))
+        # testing
+        correct_cnt, ave_loss = 0, 0
+        total_cnt = 0
+        for batch_idx, (x, target) in enumerate(test_loader):
+            if use_cuda:
+                x, target = x.cuda(), target.cuda()
+            with torch.no_grad():
+                x, target = Variable(x), Variable(target)
+            out = model(x)
+
+            loss = criterion(out, target) 
+            _, pred_label = torch.max(out.data, 1)
+            total_cnt += x.data.size()[0]
+            correct_cnt += (pred_label == target.data).sum()
+            # smooth average
+            ave_loss = ave_loss * 0.9 + loss.item() * 0.1
+
+        if(batch_idx+1) % 100 == 0 or (batch_idx+1) == len(test_loader):
+            print('==>>> epoch: {}, batch index: {}, test loss: {:.5f}, acc: {}'.format(epoch, batch_idx+1, ave_loss, float(correct_cnt) * 1.0 / total_cnt))
+
+        train_loss.append(ave_loss)
+        test_error.append(float(correct_cnt) * 1.0 / total_cnt)
+
+    return model, train_loss, test_error
+
 ## training
 model = MLPNet()
 
 epochs = 10
 learning_rate = 0.01
 momentum = 0.9
-lmbd = 0.0005
+lmbd = 1e-10
+kappa = 3000
 
 if use_cuda:
     model = model.cuda()
 
-optimizer = optim.SGD(model.parameters(), lr=learning_rate, momentum=momentum)
+#optimizer = optim.SGD(model.parameters(), lr=learning_rate, momentum=momentum)
+#optimizer = SGDl1(model.parameters(), lr=learning_rate, lambda_l1=lmbd, momentum=momentum)
+
+optimizer = SGDFWNuclear(model.parameters(), kappa_l1=kappa)
 
 criterion = nn.CrossEntropyLoss()
 
+model, train_loss, test_error = train_model(model, optimizer, criterion, epochs, train_loader)
 
 
-for epoch in range(epochs):
-    # trainning
-    ave_loss = 0
-    for batch_idx, (x, target) in enumerate(train_loader):
-        optimizer.zero_grad()
-        if use_cuda:
-            x, target = x.cuda(), target.cuda()
-        x, target = Variable(x), Variable(target)
-        out = model(x)
+plt.plot(train_loss, label='train loss')
+plt.plot(test_error, label='test error')
+plt.xlabel("epochs"); 
+plt.title("FWDL"); plt.legend();
 
-        loss = criterion(out, target) 
-        ave_loss = ave_loss * 0.9 + loss.item() * 0.1
-        loss.backward()
-        optimizer.step()
-        if (batch_idx+1) % 100 == 0 or (batch_idx+1) == len(train_loader):
-            print('==>>> epoch: {}, batch index: {}, train loss: {:.5f}'.format(
-                epoch, batch_idx+1, ave_loss))
-    # testing
-    correct_cnt, ave_loss = 0, 0
-    total_cnt = 0
-    for batch_idx, (x, target) in enumerate(test_loader):
-        if use_cuda:
-            x, target = x.cuda(), target.cuda()
-        with torch.no_grad():
-            x, target = Variable(x), Variable(target)
-        out = model(x)
-
-        loss = criterion(out, target) 
-        _, pred_label = torch.max(out.data, 1)
-        total_cnt += x.data.size()[0]
-        correct_cnt += (pred_label == target.data).sum()
-        # smooth average
-        ave_loss = ave_loss * 0.9 + loss.item() * 0.1
-
-    if(batch_idx+1) % 100 == 0 or (batch_idx+1) == len(test_loader):
-        print('==>>> epoch: {}, batch index: {}, test loss: {:.5f}, acc: {}'.format(epoch, batch_idx+1, ave_loss, float(correct_cnt) * 1.0 / total_cnt))
+plt.show()
 
 #torch.save(model.state_dict(), model.name())
