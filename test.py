@@ -18,22 +18,22 @@ train_loader, test_loader = utils.load(batch_size=batch_size)
 
 ## Chose hyper-parameters
 
-model = net.MLPNet()
+model = net.MLPNet(zero_init=True)
 
-epochs = 1
+epochs = 20
 learning_rate = 0.01
 momentum = 0.9
 lmbd = 1e-10
-kappa = 3000
+kappa = 1000000
 
 if use_cuda:
     model = model.cuda()
 
 ## Choose optimizer
 
-#optimizer = optim.SGD(model.parameters(), lr=learning_rate, momentum=momentum)
+optimizer = optim.SGD(model.parameters(), lr=learning_rate, momentum=momentum)
 #optimizer = SGDl1(model.parameters(), lr=learning_rate, lambda_l1=lmbd, momentum=momentum)
-optimizer = PSGDl1(model.parameters(), lr=learning_rate, kappa_l1=kappa, momentum=momentum)
+#optimizer = PSGDl1(model.parameters(), lr=learning_rate, kappa_l1=kappa, momentum=momentum)
 #optimizer = SGDFWNuclear(model.parameters(), kappa_l1=kappa)
 
 
@@ -44,13 +44,12 @@ criterion = nn.CrossEntropyLoss(size_average=False)
 
 ## train model
 
-model, train_loss, test_error = net.train_model(model, optimizer, criterion, epochs,
-                                                train_loader, test_loader, use_cuda)
-
+model, metrics = net.train_model(model, optimizer, criterion, epochs, train_loader, test_loader)
+print(metrics['sparsity'])
 
 ## plot results
 
-utils.plot_loss_acc(train_loss, test_error, optimizer.name())
+#utils.plot_loss_acc(train_loss, test_error, optimizer.name())
 
 ## save model
 
