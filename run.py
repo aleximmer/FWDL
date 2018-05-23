@@ -37,7 +37,7 @@ if __name__ == '__main__':
     parser.add_argument('-k', '--kappa', type=float, help='kappa l1 threshold for parameters', default=None)
     parser.add_argument('-m', '--method', type=str, choices=['PSGDl1', 'SGDFWl1', 'SGD'],
                         help='method among PSGDl1, SGDFWl1, SGD', required=True)
-    parser.add_argument('-e', '--epochs', type=int, default=250)
+    parser.add_argument('-e', '--epochs', type=int, default=100)
     parser.add_argument('-b', '--batchsize', type=int, default=256)
     parser.add_argument('-lr', '--learning_rate', type=float, default=0.01)
     parser.add_argument('--momentum', type=float, default=0.9)
