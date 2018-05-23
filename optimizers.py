@@ -36,6 +36,7 @@ class SGDl1(Optimizer):
 
 class SGDFWl1(Optimizer):
     def __init__(self, params, kappa_l1):
+        self.k = 0
         assert kappa > 0
         defaults = dict(kappa=kappa_l1)
         super(Optimizer, self).__init__(params, defaults)
@@ -59,10 +60,12 @@ class SGDFWl1(Optimizer):
                     continue
                 d_p = p.grad.data
                 s = LMO_l1(d_p, kappa)
-                gamma = None
+                gamma = 2 / (self.k + 2)
+                
 
                 #d_p.add_(lam, torch.sign(p.data))
 
                 p.data.add_(-group['lr'], d_p)
 
+        self.k += 1
         return loss
