@@ -22,13 +22,13 @@ class MLPNet(nn.Module):
     def forward(self, x):
 
         x = x.view(-1, 28*28)
-        x = F.sigmoid(self.fc1(x)) # tanh
-        x = F.sigmoid(self.fc2(x))
-        x = self.fc3(x)
+        x = F.tanh(self.fc1(x)) 
+        x = F.tanh(self.fc2(x))
+        x = F.softmax(self.fc3(x), dim=1)
         return x
     
 
-def train_model(model, optimizer, criterion, epochs, train_loader, use_cuda=False, print_progress=True):
+def train_model(model, optimizer, criterion, epochs, train_loader, test_loader, use_cuda=False, print_progress=True):
     """ 
     """
 

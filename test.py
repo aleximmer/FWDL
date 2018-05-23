@@ -58,14 +58,15 @@ if use_cuda:
 
 ## Choose optimizer
 
-#optimizer = optim.SGD(model.parameters(), lr=learning_rate, momentum=momentum)
+optimizer = optim.SGD(model.parameters(), lr=learning_rate, momentum=momentum)
 #optimizer = SGDl1(model.parameters(), lr=learning_rate, lambda_l1=lmbd, momentum=momentum)
+#optimizer = SGDFWNuclear(model.parameters(), kappa_l1=kappa)
 
-optimizer = SGDFWNuclear(model.parameters(), kappa_l1=kappa)
+
 criterion = nn.CrossEntropyLoss()
 
-model, train_loss, test_error = net.train_model(model, optimizer, \
-                                                    criterion, epochs, train_loader, use_cuda)
+model, train_loss, test_error = net.train_model(model, optimizer, criterion, epochs, \
+                                                    train_loader, test_loader, use_cuda)
 
 
 plt.plot(train_loss, label='train loss')
