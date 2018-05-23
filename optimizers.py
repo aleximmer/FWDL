@@ -111,9 +111,12 @@ class SGDFWNuclear(Optimizer):
             for p in group['params']:
                 if p.grad is None:
                     continue
-
-                print(p.grad.data.numpy().shape)
-                s = LMO_nuclear(p.grad.data.numpy(), kappa)
+                grad = p.grad.data.numpy()
+                d = len(grad.shape)
+                if d == 1 or d >= 3:
+                    s = LMO_l1(grad, kappa)
+                else:
+                    s = LMO_nuclear(grad, kappa)
                 gamma = 2 / (self.k + 2)
                 # x^(k+1) = x^(k) - g x^(k) + g s
                 delta_p = torch.Tensor(gamma * s - gamma * p.data.numpy())
