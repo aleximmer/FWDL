@@ -40,6 +40,9 @@ class MLPNet(nn.Module):
     def get_weight_matrices(self):
         return [l.weight.detach().numpy() for l in self.layers]
 
+    def get_bias_vectors(self):
+        return [l.bias.detach().numpy() for l in self.layers]
+
     def paths(self):
         if self._paths is not None:
             return self._paths
@@ -115,6 +118,7 @@ def train_model(model, optimizer, criterion, epochs, train_loader, test_loader, 
     active_paths = []
     active_params = []
     weight_matrices = []
+    bias_vectors = []
     for epoch in range(1, epochs+1):
         sum_loss = 0
         n_correct = 0
@@ -137,6 +141,7 @@ def train_model(model, optimizer, criterion, epochs, train_loader, test_loader, 
         active_paths.append(model.f_active_paths())
         active_params.append(model.f_active_params())
         weight_matrices.append(model.get_weight_matrices())
+        bias_vectors.append(model.get_bias_vectors())
         train_loss.append(sum_loss / n_samples)
         train_acc.append(n_correct / n_samples)
 
@@ -167,5 +172,5 @@ def train_model(model, optimizer, criterion, epochs, train_loader, test_loader, 
     metrics = {'train': {'loss': train_loss, 'acc': train_acc},
                'test': {'loss': test_loss, 'acc': test_acc},
                'sparsity': {'params': active_params, 'nodes': active_nodes, 'paths': active_paths},
-               'weights': weight_matrices}
+               'params': {'weights': weight_matrices, 'biases': bias_vectors}}
     return model, metrics

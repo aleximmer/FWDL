@@ -1,7 +1,6 @@
 import torch
 import torchvision.transforms as transforms
 import torchvision.datasets as dset
-from matplotlib import pyplot as plt
 import os
 
 
@@ -32,12 +31,3 @@ def load(batch_size=256, seed=7):
     )
 
     return train_loader, test_loader
-
-
-def plot_loss_acc(train_loss, test_error, optimizer):
-    plt.plot(train_loss, label='train loss')
-    plt.plot(test_error, label='test error')
-    plt.xlabel("epochs")
-    plt.title("Optimizer = " + optimizer)
-    plt.legend()
-    plt.show()
