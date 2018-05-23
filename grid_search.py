@@ -17,5 +17,9 @@ if __name__ == '__main__':
     args = parser.parse_args()
     m, e, b, lr, mo = args.method, args.epochs, args.batchsize, args.learning_rate, args.momentum
     prms = [(m, kappa, e, b, lr, mo) for kappa in args.kappas]
-    with Pool(processes=args.processes) as pool:
-        pool.starmap(experiment, prms)
+    if args.processes > 1:
+        with Pool(processes=args.processes) as pool:
+            pool.starmap(experiment, prms)
+    else:
+        for param in prms:
+            experiment(*param)
