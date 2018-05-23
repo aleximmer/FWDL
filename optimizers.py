@@ -1,9 +1,10 @@
 import torch
 from torch.optim import Optimizer
-from oracles import LMO_nuclear, LMO_l1
+from oracles import LMO_nuclear, LMO_l1, P_l1
 
 
 class SGDl1(Optimizer):
+    """l1 weight decay optimizer"""
     def __init__(self, params, lr, lambda_l1, momentum=0, dampening=0, nesterov=False):
         assert lambda_l1 > 0
         defaults = dict(lr=lr, l1=lambda_l1, momentum=momentum,
@@ -44,6 +45,51 @@ class SGDl1(Optimizer):
                     d_p = buf
 
                 p.data.add_(-group['lr'], d_p)
+
+        return loss
+
+
+class PSGDl1(Optimizer):
+    """Projected SGD with projection onto l1 norm ball <= lambda_l1"""
+    def __init__(self, params, lr, kappa_l1, momentum=0, dampening=0, nesterov=False):
+        assert kappa_l1 > 0
+        defaults = dict(lr=lr, kappa=kappa_l1, momentum=momentum,
+                        dampening=dampening, nesterov=nesterov)
+        super(PSGDl1, self).__init__(params, defaults)
+
+    def step(self, closure=None):
+        """Performs a single optimization step.
+
+        Arguments:
+            closure (callable, optional): A closure that reevaluates the model
+                and returns the loss.
+        """
+        loss = None
+        if closure is not None:
+            loss = closure()
+
+        for group in self.param_groups:
+            kappa = group['kappa']
+            momentum = group['momentum']
+            dampening = group['dampening']
+
+            for p in group['params']:
+                if p.grad is None:
+                    continue
+                d_p = p.grad.data
+
+                if momentum != 0:
+                    param_state = self.state[p]
+                    if 'momentum_buffer' not in param_state:
+                        buf = param_state['momentum_buffer'] = torch.zeros_like(p.data)
+                        buf.mul_(momentum).add_(d_p)
+                    else:
+                        buf = param_state['momentum_buffer']
+                        buf.mul_(momentum).add_(1 - dampening, d_p)
+                    d_p = buf
+
+                p.data.add_(-group['lr'], d_p)
+                p.data = torch.Tensor(P_l1(p.data.numpy(), kappa))
 
         return loss
 
