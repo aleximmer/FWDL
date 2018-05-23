@@ -13,6 +13,12 @@ class TestLMOl1(unittest.TestCase):
             fs = np.linalg.norm(s, ord=1)
             self.assertAlmostEqual(fs, kappa)
 
+    def test_reshaping(self):
+        v = np.zeros((10, 10))
+        v[3, 5] = 2
+        s = LMO_l1(v, kappa=2)
+        self.assertEqual(-2, s[3, 5])
+
 
 class TestLMONuclear(unittest.TestCase):
     def test_feasibility(self):
