@@ -6,7 +6,7 @@ def LMO_l1(grad, kappa):
     s = np.zeros(grad.shape)
     coord = np.argmax(np.abs(grad))
     s[coord] = kappa * np.sign(grad[coord])
-    return - s * coord
+    return - s
 
 
 def LMO_nuclear(grad, kappa):
