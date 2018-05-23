@@ -86,6 +86,7 @@ class SGDFWl1(Optimizer):
 
 class SGDFWNuclear(Optimizer):
     """Stochastic Frank Wolfe with |W_i|_* <= kappa_l1 where W_i are parameter sets
+    if the gradient has dimensionality 1 or 3 and above, we use |vec(W_i|_1 <= kappa_l1
     """
     def __init__(self, params, kappa_l1):
         self.k = 0
