@@ -13,8 +13,9 @@ if __name__ == '__main__':
     parser.add_argument('-b', '--batchsize', type=int, default=256)
     parser.add_argument('-lr', '--learning_rate', type=float, default=0.01)
     parser.add_argument('--momentum', type=float, default=0.9)
+    parser.add_argument('-p', '--processes', type=int, default=2)
     args = parser.parse_args()
     m, e, b, lr, mo = args.method, args.epochs, args.batchsize, args.learning_rate, args.momentum
     prms = [(m, kappa, e, b, lr, mo) for kappa in args.kappas]
-    with Pool(processes=8) as pool:
+    with Pool(processes=args.processes) as pool:
         pool.starmap(experiment, prms)
