@@ -13,7 +13,8 @@ def get_exp_name(*args):
 
 def experiment(method, kappa, epochs, batch_size, lr, momentum):
     train_loader, test_loader = utils.load(batch_size=batch_size)
-    model = MLPNet(zero_init=True)
+    zinit = (method != 'SGD')
+    model = MLPNet(zero_init=zinit)
     if method == 'SGD':
         optimizer = SGD(model.parameters(), lr=lr, momentum=momentum)
     elif method == 'PSGDl1':
