@@ -41,8 +41,9 @@ if __name__ == '__main__':
     parser.add_argument('-b', '--batchsize', type=int, default=256)
     parser.add_argument('-lr', '--learning_rate', type=float, default=0.01)
     parser.add_argument('--momentum', type=float, default=0.9)
-    parser.add_argument('-z', '--zero_init', type=bool, default=True)
+    parser.add_argument('-z', '--zero_init', type=int, default=1, choices=[0, 1], help='0 is False, 1 True')
     args = parser.parse_args()
+    zinit = bool(args.zero_init)
     if args.kappa is None and args.method != 'SGD':
         raise ValueError('Requires kappa parameter for constrained optimization')
-    experiment(args.method, args.kappa, args.epochs, args.batchsize, args.learning_rate, args.momentum, args.zero_init)
+    experiment(args.method, args.kappa, args.epochs, args.batchsize, args.learning_rate, args.momentum, zinit)
