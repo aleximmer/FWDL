@@ -4,9 +4,10 @@ from oracles import LMO_nuclear, LMO_l1
 
 
 class SGDl1(Optimizer):
-    def __init__(self, params, lr, lambda_l1, momentum=0):
+    def __init__(self, params, lr, lambda_l1, momentum=0, dampening=0, nesterov=False):
         assert lambda_l1 > 0
-        defaults = dict(lr=lr, l1=lambda_l1, momentum=momentum)
+        defaults = dict(lr=lr, l1=lambda_l1, momentum=momentum,
+                        dampening=dampening, nesterov=nesterov)
         super(SGDl1, self).__init__(params, defaults)
 
     def step(self, closure=None):
