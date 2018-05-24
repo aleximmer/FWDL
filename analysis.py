@@ -13,6 +13,8 @@ def get_result_frame(method, kappa, epochs, batchsize, zero_init):
                       columns=list(range(1, epochs+1)))
     df.loc['acctest'] = res['test']['acc']
     df.loc['acctrain'] = res['train']['acc']
+    df.loc['losstest'] = res['test']['loss']
+    df.loc['losstrain'] = res['train']['loss']
     df.loc['paths'] = res['sparsity']['paths']
     df.loc['nodes'] = res['sparsity']['nodes']
     df.loc['params'] = res['sparsity']['params']
@@ -33,6 +35,21 @@ def plot_performances(dfs, dfw, dfp):
     plt.legend()
     plt.tight_layout()
     plt.savefig('performances.png')
+    plt.show()
+
+
+def plot_losses(dfs, dfw, dfp):
+    plt.plot(dfs.T.losstest, label='SGD test')
+    plt.plot(dfs.T.losstrain, label='SGD train')
+    plt.plot(dfw.T.losstest, label='FW test')
+    plt.plot(dfw.T.losstrain, label='FW train')
+    plt.plot(dfp.T.losstest, label='PSGD test')
+    plt.plot(dfp.T.losstrain, label='PSGD train')
+    plt.ylabel('Loss')
+    plt.xlabel('Epoch')
+    plt.legend()
+    plt.tight_layout()
+    plt.savefig('losses.png')
     plt.show()
 
 
@@ -114,6 +131,7 @@ def conduct_analysis(kappa_psgd, kappa_sgdfw, epochs, batchsize, agg):
     plot_and_log_sparsity(dfs, dfw, dfp)
     plot_input_activations(dfs, dfw, dfp, agg)
     plot_sparse_network(dfw, epochs)
+    plot_losses(dfs, dfw, dfp)
 
 
 if __name__ == '__main__':

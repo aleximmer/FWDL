@@ -77,3 +77,17 @@ python analysis.py --kappa_psgd 4096 --kappa_sgdfw 4096 -e 250
 
 The resulting plots as used in the report will be saved in the working directory. Further, the sparsities
 are logged to the terminal.
+
+### Requirements
+
+We use python 3.6, the whole code ist run with anaconda python so we recommend that.
+
+package requirements:
+
+```
+numpy
+scipy
+pandas
+pytorch
+matplotlib
+```
