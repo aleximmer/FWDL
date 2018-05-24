@@ -42,13 +42,27 @@ To explore the hyper-parameters (mainly kappa, the radius of the simplex) grid s
 
 The loading of the MNIST data-set code can be found in `utils.py`.
 
-Simple tests for the oracles can be found in `test_oracles.py`.
+Simple tests for the oracles can be found in `test_oracles.py`. The code has also been tested
+thoroughly but no unittests are provided.
 
+##### - Reproducing Results and plots
 
+To obtain the result of several different models, use `grid_search` with an array of kappa values. This is
+very intensive and takes time so we will describe here the procedure to obtain the final models.
+k corresponds to kappa, the l1 upper bound as described in the report. e corresponds to epochs and z determines
+if the model is zero-initialized (1) or not (0). Zero-initialization only works with the Frank Wolfe method
+as described in the report.
 
+```bash
+python run.py -m SGD -e 250 -z 0
+python run.py -m PSGDl1 -e 250 -k 4096 -z 1
+python run.py -m SGDFWl1 -e 250 -k 4096
+```
 
+This will save all the required files for analysis under `results/`. The analysis is done using
+`analysis.py` with the following corresponding parameters that depend on the above chosen
+parameters in turn:
 
-
-
-
-
+```bash
+python analysis.py --kappa_psgd 4096 --kappa_sgdfw 4096 -e 250
+```
