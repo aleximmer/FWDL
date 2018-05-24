@@ -16,7 +16,8 @@ if __name__ == '__main__':
     parser.add_argument('-p', '--processes', type=int, default=1)
     parser.add_argument('-z', '--zero_init', type=bool, default=True)
     args = parser.parse_args()
-    m, e, b, lr, mo, z = args.method, args.epochs, args.batchsize, args.learning_rate, args.momentum, args.zero_init
+    zinit = bool(args.zero_init)
+    m, e, b, lr, mo, z = args.method, args.epochs, args.batchsize, args.learning_rate, args.momentum, zinit
     prms = [(m, kappa, e, b, lr, mo, z) for kappa in args.kappas]
     if args.processes > 1:
         with Pool(processes=args.processes) as pool:
