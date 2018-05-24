@@ -27,8 +27,7 @@ The optimizer functions can be found in `oracles.py`, respectively, they are:
 * SGDFWNuclear: Stochastic Frank Wolfe with |W_i|_* <= kappa_l1 where W_i are parameter sets, if the gradient has dimensionality 1 or 3 and above, we use |vec(W_i|_1 <= kappa_l1.
 
 The optimizers use the following oracles (which can be found in `optimizers.py`):
-* LMO_l1: 
-* LMO_nuclear: 
+* LMO_l1: Performs the linear maximum oracle on the simplex.
 * P_l1: Given a vector and the radius of the simplex, returns a projection of the vector onto said simplex.
 
 
