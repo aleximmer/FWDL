@@ -7,9 +7,6 @@ import numpy as np
 EPS = 1e-8  # sparsity threshold
 
 
-# TODO: -0.5 & all zero does not converge (just like tanh)
-# TODO: FW without -0.5 works with 0 init
-
 class MLPNet(nn.Module):
     def __init__(self, zero_init=True):
         super(MLPNet, self).__init__()
@@ -69,20 +66,10 @@ class MLPNet(nn.Module):
 
     def _comp_active_nodes(self, layer):
         # count outgoing sparsity
-        nextl = self.layers[layer]
-        W = nextl.weight.detach().numpy()
-        active_out = (np.sum(~np.isclose(W, 0, atol=EPS), axis=0) >= 1)
-        """
-        if layer > 0:
-            # count incoming sparsity
-            prevl = self.layers[layer - 1]
-            W, b = prevl.weight.detach().numpy(), prevl.bias.detach().numpy()
-            nodes = np.concatenate([W, b[:, np.newaxis]], axis=1)
-            active_in = (np.sum(~np.isclose(nodes, 0, atol=EPS), axis=1) >= 1)
-            active = active_in if active_out is None else (active_out | active_in)
-        else:
-            active = active_out"""
-        return np.sum(active_out)
+        l = self.layers[layer]
+        W = l.weight.detach().numpy()
+        active = (np.sum(~np.isclose(W, 0, atol=EPS), axis=0) >= 1)
+        return np.sum(active)
 
     def params(self):
         if self._params is not None:

@@ -6,7 +6,6 @@ from network import MLPNet, train_model
 import utils
 
 
-# default kappa was 300 or 1000
 def get_exp_name(*args):
     return '_'.join([str(e) for e in args])
 
@@ -37,11 +36,12 @@ if __name__ == '__main__':
     parser.add_argument('-k', '--kappa', type=float, help='kappa l1 threshold for parameters', default=None)
     parser.add_argument('-m', '--method', type=str, choices=['PSGDl1', 'SGDFWl1', 'SGD'],
                         help='method among PSGDl1, SGDFWl1, SGD', required=True)
-    parser.add_argument('-e', '--epochs', type=int, default=100)
-    parser.add_argument('-b', '--batchsize', type=int, default=256)
-    parser.add_argument('-lr', '--learning_rate', type=float, default=0.01)
-    parser.add_argument('--momentum', type=float, default=0.9)
-    parser.add_argument('-z', '--zero_init', type=int, default=1, choices=[0, 1], help='0 is False, 1 True')
+    parser.add_argument('-e', '--epochs', type=int, default=100, help='number of epochs')
+    parser.add_argument('-b', '--batchsize', type=int, default=256, help='batch size')
+    parser.add_argument('-lr', '--learning_rate', type=float, default=0.01, help='learning rate for SGD and PSGDl1')
+    parser.add_argument('--momentum', type=float, default=0.9, help='momentum for SGD and PSGDlq')
+    parser.add_argument('-z', '--zero_init', type=int, default=1, choices=[0, 1],
+                        help='initialize the network with only zeros. 0 is False, 1 True')
     args = parser.parse_args()
     zinit = bool(args.zero_init)
     if args.kappa is None and args.method != 'SGD':

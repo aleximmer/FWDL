@@ -1,5 +1,4 @@
 import numpy as np 
-from scipy.sparse.linalg import svds
 from projections import euclidean_proj_l1ball
 
 
@@ -10,11 +9,6 @@ def LMO_l1(grad, kappa):
     coord = np.argmax(np.abs(grad))
     s[coord] = kappa * np.sign(grad[coord])
     return - s.reshape(*shape)
-
-
-def LMO_nuclear(grad, kappa):
-    u, s, vt = svds(grad, k=1, which='LM')
-    return - kappa * np.outer(u, vt)
 
 
 def P_l1(grad, kappa):
