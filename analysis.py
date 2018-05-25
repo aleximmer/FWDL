@@ -72,6 +72,36 @@ def plot_and_log_sparsity(dfs, dfw, dfp):
     plt.show()
 
 
+def plot_sparsity_and_performances(dfs, dfw, dfp):
+    fig = plt.figure(figsize=(7, 4.8))
+    ax1 = plt.subplot2grid((1, 5), (0, 0), colspan=3)
+    ax2 = plt.subplot2grid((1, 5), (0, 3), colspan=2)
+    ax2.set_yticks([])
+    yrange = [0.02, 1.02]
+    ax1.set_ylim(*yrange)
+    ax2.set_ylim(*yrange)
+    ax1.set_ylabel('Accuracy / Fraction')
+    ax1.set_xlabel('Epochs')
+    ax2.set_xlabel('Epochs')
+    ax2.plot(dfp.T.paths, label='PSGD Paths', alpha=0.7)
+    ax2.plot(dfw.T.paths, label='FW Paths', alpha=0.7)
+    ax2.plot(dfp.T.nodes, label='PSGD Nodes', alpha=0.7)
+    ax2.plot(dfw.T.nodes, label='FW Nodes', alpha=0.7)
+    ax2.plot(dfp.T.params, label='PSGD Params', alpha=0.7)
+    ax2.plot(dfw.T.params, label='FW Params', alpha=0.7)
+    ax1.plot(dfs.T.acctest, label='SGD test', alpha=0.7)
+    ax1.plot(dfs.T.acctrain, label='SGD train', alpha=0.7)
+    ax1.plot(dfw.T.acctest, label='FW test', alpha=0.7)
+    ax1.plot(dfw.T.acctrain, label='FW train', alpha=0.7)
+    ax1.plot(dfp.T.acctest, label='PSGD test', alpha=0.7)
+    ax1.plot(dfp.T.acctrain, label='PSGD train', alpha=0.7)
+    ax1.legend(fontsize='xx-small')
+    ax2.legend(fontsize='xx-small')
+    plt.tight_layout()
+    plt.savefig('sparsity_perf.png')
+    plt.show()
+
+
 def log_sparsity(method, df):
     print(method + ': ', 'paths: ', list(df.T.paths)[-1], 'nodes: ', list(df.T.nodes)[-1],
           'params: ', list(df.T.params)[-1])
@@ -125,8 +155,9 @@ def plot_sparse_network(dfw, epochs):
 
 def conduct_analysis(kappa_psgd, kappa_sgdfw, epochs, batchsize, agg):
     dfs = get_result_frame('SGD', None, epochs, batchsize, False)
-    dfw = get_result_frame('SGDFWl1', kappa_sgdfw, epochs, batchsize, True)
+    dfw = get_result_frame('SGDFWl1', kappa_sgdfw, epochs, batchsize, False)
     dfp = get_result_frame('PSGDl1', kappa_psgd, epochs, batchsize, False)
+    plot_sparsity_and_performances(dfs, dfw, dfp)
     plot_performances(dfs, dfw, dfp)
     plot_and_log_sparsity(dfs, dfw, dfp)
     plot_input_activations(dfs, dfw, dfp, agg)
