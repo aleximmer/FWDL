@@ -56,15 +56,15 @@ python grid_search.py -m SGDFWl1 -e 250 -z 0 -k 16 32 64 128 256 512 1024 2048 4
 and do the same for `-m PSGDl1 -z 1` and without the kappa values for `-m SGD -z 1`.
 
 k corresponds to kappa, the l1 upper bound as described in the report. e corresponds to epochs and z determines
-if the model is zero-initialized (1) or not (0). Zero-initialization only works with the Frank Wolfe method
-as described in the report.
+if the model is zero-initialized (1) or not (0). We do not use 0 for our experiments as it only works for
+Frank Wolfe and is equivalent to random initialization in this case.
 
 To reproduce the results with final parameters used, run
 
 ```bash
 python run.py -m SGD -e 250 -z 0
 python run.py -m PSGDl1 -e 250 -k 4096 -z 0
-python run.py -m SGDFWl1 -e 250 -k 4096 -z 1
+python run.py -m SGDFWl1 -e 250 -k 4096 -z 0
 ```
 
 This will save all the required files for analysis under `results/`. The analysis is done using
@@ -80,7 +80,7 @@ are logged to the terminal.
 
 ### Requirements
 
-We use python 3.6, the whole code ist run with anaconda python so we recommend that.
+We use python 3.6, the whole code is run with anaconda python.
 
 package requirements:
 
