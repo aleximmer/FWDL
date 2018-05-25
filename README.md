@@ -53,7 +53,7 @@ grid_search we used a large array of parameters. For reproduction, run
 ```bash
 python grid_search.py -m SGDFWl1 -e 250 -z 0 -k 16 32 64 128 256 512 1024 2048 4096 8192 ...
 ```
-and do the same for `-m PSGDl1 -z 1` and without the kappa values for `-m SGD -z 1`.
+and do the same for `-m PSGDl1` and without the kappa values for `-m SGD`.
 
 k corresponds to kappa, the l1 upper bound as described in the report. e corresponds to epochs and z determines
 if the model is zero-initialized (1) or not (0). We do not use 0 for our experiments as it only works for
