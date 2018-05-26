@@ -15,14 +15,14 @@ in your bash. Also you will need internet connection so as to download the mnist
 data before training which is done automatically.
 
 
-### - Model and training
+### Model and training
 
 The model architecture can be found in `network.py`, a method to train said model
 ('network.train_model(model, optimizer, ...)') can be found in the same file. The metrics described in
 the report are implemented within the network and collected during training. Afterwards,
 a dictionary of metrics is returned and saved when used in conjunction with `run.py`.
 
-### - Optimizers and Oracles
+### Optimizers and Oracles
 
 The optimizer functions can be found in `oracles.py`, respectively, they are:
 
@@ -34,18 +34,18 @@ The optimizers use the following oracles (which can be found in `optimizers.py`)
 * LMO_l1: Performs the linear maximum oracle on the l1 ball.
 * P_l1: Given a vector and the radius of the l1 ball, returns a projection of the vector onto said l1 ball.
 
-### - Experiment
+### Experiment
 
 The experiment is done in the `run.py`. It will pickle and save all results obtained during training
 in the results folder. To run several experiments at once, we have `grid_search.py`. Both provide a
 command line interface and the parameters are straight-forward. `run.py` also shows help messages for all
 parameters.
 
-### - Auxiliary
+### Auxiliary
 
 The loading of the MNIST data-set code can be found in `utils.py`.
 
-### - Reproducing Results and plots
+### Reproducing Results and plots
 
 To obtain the result of several different models, use `grid_search` with an array of kappa values. This is
 very intensive and takes time so we will describe here the procedure to obtain the final models. To run this
