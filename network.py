@@ -95,17 +95,9 @@ class MLPNet(nn.Module):
         return self.active_params() / self.params()
 
 
-def train_model(model, optimizer, criterion, epochs, train_loader, test_loader, print_progress=True):
+def train_model(model, optimizer, criterion, epochs, train_loader, test_loader, run):
     """ trains a model using a given optimizer and criterion. 
     """
-    train_loss, test_loss = [], []
-    train_acc, test_acc = [], []
-    train_loss, test_error = [], []
-    active_nodes = []
-    active_paths = []
-    active_params = []
-    weight_matrices = []
-    bias_vectors = []
     for epoch in range(1, epochs+1):
         sum_loss = 0
         n_correct = 0
@@ -124,13 +116,13 @@ def train_model(model, optimizer, criterion, epochs, train_loader, test_loader, 
             loss.backward()
             optimizer.step()
             # measure sparsity and paths
-        active_nodes.append(model.f_active_nodes())
-        active_paths.append(model.f_active_paths())
-        active_params.append(model.f_active_params())
-        weight_matrices.append(model.get_weight_matrices())
-        bias_vectors.append(model.get_bias_vectors())
-        train_loss.append(sum_loss / n_samples)
-        train_acc.append(n_correct / n_samples)
+        run.log_scalar('Active Nodes', model.f_active_nodes(), epoch)
+        run.log_scalar('Active Paths', model.f_active_paths(), epoch)
+        run.log_scalar('Active Params', model.f_active_params(), epoch)
+        run.log_scalar('Loss Train', sum_loss / n_samples, epoch)
+        run.log_scalar('Acc Train', n_correct / n_samples, epoch)
+        train_loss = sum_loss / n_samples
+        train_acc = n_correct / n_samples
 
         # testing
         sum_loss = 0
@@ -147,17 +139,16 @@ def train_model(model, optimizer, criterion, epochs, train_loader, test_loader, 
 
             loss = criterion(out, target)
             sum_loss += loss.item()
-        test_loss.append(sum_loss / n_samples)
-        test_acc.append(n_correct / n_samples)
+        run.log_scalar('Loss Test', sum_loss / n_samples, epoch)
+        run.log_scalar('Acc Test', n_correct / n_samples, epoch)
 
-        if print_progress:
-            lt, at = train_loss[-1], train_acc[-1]
-            lte, ate = test_loss[-1], test_acc[-1]
-            print('Epoch {e}: train: {lt} loss, {at} acc; test: {lte} loss, {ate} acc'
-                  .format(e=epoch, lt=lt, at=at, lte=lte, ate=ate))
-
-    metrics = {'train': {'loss': train_loss, 'acc': train_acc},
-               'test': {'loss': test_loss, 'acc': test_acc},
-               'sparsity': {'params': active_params, 'nodes': active_nodes, 'paths': active_paths},
-               'params': {'weights': weight_matrices, 'biases': bias_vectors}}
-    return model, metrics
+    final_metrics = {
+        'Loss Test': sum_loss / n_samples,
+        'Acc Test': n_correct / n_samples,
+        'Acc Train': train_acc,
+        'Loss Train': train_loss,
+        'Active Paths': model.f_active_paths(),
+        'Active Nodes': model.f_active_nodes(),
+        'Active Params': model.f_active_params()
+    }
+    return model, final_metrics, model.get_weight_matrices()
