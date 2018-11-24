@@ -11,8 +11,8 @@ def plot_input_activations(weights, aggst, run):
     ax1.set_xticks([])
     ax1.set_yticks([])
     plt.tight_layout()
-    plt.savefig('figure.png')
-    run.add_artifact('figure.png', 'NetActivation-{aggst}.png'.format(aggst=aggst))
+    plt.savefig('figure.svg')
+    run.add_artifact('figure.svg', 'NetActivation-{aggst}.svg'.format(aggst=aggst))
     plt.gcf().clear()
 
 
@@ -35,6 +35,6 @@ def plot_sparse_network(weights, run):
     plt.xticks([])
     plt.yticks([])
     plt.tight_layout()
-    plt.savefig('figure.png')
-    run.add_artifact('figure.png', 'Sparsity.png')
+    plt.savefig('figure.svg')
+    run.add_artifact('figure.svg', 'Sparsity.svg')
     plt.gcf().clear()
