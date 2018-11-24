@@ -5,6 +5,7 @@ __pycache__/
 results/
 data/
 .idea/
+private.py
 
 # C extensions
 *.so
