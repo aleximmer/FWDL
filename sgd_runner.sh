@@ -1,0 +1,9 @@
+python run.py with swell_sgd batch_size=64 step_size=0.01
+python run.py with swell_sgd batch_size=128 step_size=0.01
+python run.py with swell_sgd batch_size=256 step_size=0.01
+python run.py with swell_sgd batch_size=64 step_size=0.05
+python run.py with swell_sgd batch_size=128 step_size=0.05
+python run.py with swell_sgd batch_size=256 step_size=0.05
+python run.py with swell_sgd batch_size=64 step_size=0.005
+python run.py with swell_sgd batch_size=128 step_size=0.005
+python run.py with swell_sgd batch_size=256 step_size=0.005

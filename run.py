@@ -16,7 +16,7 @@ def configuration():
     kappa = None
     method = None
     epochs = 200
-    batch_size = 128
+    batch_size = 256
     step_size = None
     momentum = None
     method_tag = None
@@ -34,12 +34,14 @@ def swell_projected_sgd():
     kappa = 512
     method = 'PSGDl1'
     method_tag = 'PSGD-NN'
+    momentum = 0.9
 
 
 @ex.named_config
 def swell_sgd():
     method = 'SGD'
     method_tag = 'NN'
+    momentum = 0.9
 
 
 @ex.automain
